@@ -7,6 +7,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
   <style>  
+    /* Existing Styles */
    * { margin: 0; padding: 0; box-sizing: border-box; }  
     html, body {  
       background: #000;  
@@ -34,90 +35,218 @@
       visibility: hidden !important;  
       opacity: 0 !important;  
     }  
+
+    /* NEW STYLES FOR POPUP */
+    .popup-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8); /* Dark, semi-transparent background */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 100; /* Ensure it's above the video player */
+        backdrop-filter: blur(2px);
+    }
+
+    .popup-content {
+        background: #333; /* Dark background for the modal itself */
+        border-radius: 12px;
+        max-width: 90%;
+        width: 350px;
+        padding: 25px;
+        text-align: center;
+        box-shadow: 0 0 40px rgba(255, 165, 0, 0.5); /* Glowing effect */
+        border: 2px solid #ffaa00;
+        color: white;
+    }
+
+    .popup-content h2 {
+        color: #ffaa00; /* Orange heading */
+        font-size: 1.8em;
+        margin-bottom: 15px;
+    }
+
+    .popup-content p {
+        font-size: 1em;
+        line-height: 1.4;
+        margin-bottom: 25px;
+        color: #ddd;
+    }
+
+    .popup-button {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        font-size: 1.1em;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+
+    #join-now-btn {
+        background-color: #ffaa00; /* Bright orange */
+        color: #000;
+    }
+
+    #join-now-btn:hover {
+        background-color: #ffc14d;
+    }
+
+    #already-joined-btn {
+        background-color: #555; /* Darker gray for the secondary button */
+        color: white;
+    }
+
+    #already-joined-btn:hover {
+        background-color: #777;
+    }
   </style>  
 </head>  
 <body>  
   <div class="shaka-video-container" data-shaka-player>  
     <video autoplay playsinline preload="metadata" poster="https://i.ibb.co/pBzSKg3z/1586162092-020d20c6f8b5fd388ed06ba6929021b826007c55c5fa007f23d6fbac44c2e489-d.webp"></video>  
   </div>  
+
+  <div id="support-us-popup" class="popup-overlay">
+    <div class="popup-content">
+        <h2>Support Us!</h2>
+        <p>Join our Telegram Channel **@The_Cricket_Corner** for Instant cricket news, Player stats, updates, and Exclusive coverage.</p>
+        <button id="join-now-btn" class="popup-button">Join Now</button>
+        <button id="already-joined-btn" class="popup-button">Already Joined</button>
+    </div>
+  </div>
   
   <script>  
+    // Variables for your telegram link and local storage key
+    const TELEGRAM_LINK = "https://t.me/The_Cricket_Corner";
+    const JOINED_KEY = "hasJoinedTelegram";
+    const POPUP_ID = "support-us-popup";
+    
+    // Function to initialize Shaka Player (Your existing code, modified slightly)
+    async function initPlayer() {
+        const video = document.querySelector('video');  
+        const player = new shaka.Player();  
+        await player.attach(video);  
+    
+        const container = document.querySelector('.shaka-video-container');  
+        const ui = new shaka.ui.Overlay(player, container, video);  
+    
+        ui.configure({  
+            controlPanelElements: [  
+                'play_pause', 'time_and_duration', 'mute', 'volume',  
+                'spacer', 'language', 'captions', 'picture_in_picture',  
+                'quality', 'fullscreen'  
+            ],  
+            volumeBarColors: {  
+                base: 'rgba(255, 192, 203, 0.3)',  
+                level: 'rgb(255, 105, 180)'  
+            },  
+            seekBarColors: {  
+                base: 'rgba(255, 255, 0, 0.3)',  
+                buffered: 'rgba(255, 255, 0, 0.6)',  
+                played: 'rgb(255, 255, 0)'  
+            }  
+        });  
+    
+        // ✅ Your DRM Key + MPD URL  
+        let drmConfig = {  
+            clearKeys: {  
+                "23d746c8864079a0fbe3e917614ce9a4": "6c11aeb5174dfeb6acd1c92a58e012a6"  
+            }  
+        };  
+    
+        let streamUrl = "https://otte.live.fly.ww.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/bb9z4rise6/out/v1/f88e764102cb43a69031373b79dc31fd/cenc.mpd";  
+    
+        player.configure({  
+            drm: drmConfig,  
+            streaming: {  
+                lowLatencyMode: true,  
+                bufferingGoal: 15,  
+                rebufferingGoal: 2,  
+                bufferBehind: 15,  
+                retryParameters: {  
+                    timeout: 10000,  
+                    maxAttempts: 5,  
+                    baseDelay: 300,  
+                    backoffFactor: 1.2  
+                },  
+                segmentRequestTimeout: 8000,  
+                segmentPrefetchLimit: 2,  
+                useNativeHlsOnSafari: true  
+            },  
+            manifest: {  
+                retryParameters: {  
+                    timeout: 8000,  
+                    maxAttempts: 3  
+                }  
+            }  
+        });  
+    
+        player.addEventListener('error', (event) => {  
+            console.error('Shaka Player Error:', event.detail);  
+        });  
+    
+        try {  
+            await player.load(streamUrl);  
+            console.log("Stream loaded successfully");  
+        } catch (error) {  
+            console.error('Load error:', error);  
+        }
+    }
+    
+    // Function to handle the buttons and player initialization
+    function handlePopup() {
+        const popup = document.getElementById(POPUP_ID);
+        const joinBtn = document.getElementById('join-now-btn');
+        const joinedBtn = document.getElementById('already-joined-btn');
+
+        // 1. Check if the user has previously clicked "Already Joined"
+        const hasJoined = localStorage.getItem(JOINED_KEY);
+
+        if (hasJoined === 'true') {
+            // If they have joined before, hide the popup and start the player
+            popup.style.display = 'none';
+            initPlayer();
+        } else {
+            // If it's their first time, show the popup and wait for a click
+            popup.style.display = 'flex';
+        }
+
+        // 2. Add event listener for "Join Now"
+        joinBtn.addEventListener('click', () => {
+            // Open the Telegram link in a new tab
+            window.open(TELEGRAM_LINK, '_blank');
+            // Treat this as a successful join and proceed to play
+            localStorage.setItem(JOINED_KEY, 'true');
+            popup.style.display = 'none';
+            initPlayer();
+        });
+
+        // 3. Add event listener for "Already Joined"
+        joinedBtn.addEventListener('click', () => {
+            // Set the flag to remember the user's choice
+            localStorage.setItem(JOINED_KEY, 'true');
+            // Hide the popup and start the player
+            popup.style.display = 'none';
+            initPlayer();
+        });
+    }
+
+
+    // Main execution flow
     document.addEventListener('DOMContentLoaded', async () => {  
-      shaka.polyfill.installAll();  
-  
-      if (!shaka.Player.isBrowserSupported()) {  
-        console.error('Browser not supported');  
-        return;  
-      }  
-  
-      const video = document.querySelector('video');  
-      const player = new shaka.Player();  
-      await player.attach(video);  
-  
-      const container = document.querySelector('.shaka-video-container');  
-      const ui = new shaka.ui.Overlay(player, container, video);  
-  
-      ui.configure({  
-        controlPanelElements: [  
-          'play_pause', 'time_and_duration', 'mute', 'volume',  
-          'spacer', 'language', 'captions', 'picture_in_picture',  
-          'quality', 'fullscreen'  
-        ],  
-        volumeBarColors: {  
-          base: 'rgba(255, 192, 203, 0.3)',  
-          level: 'rgb(255, 105, 180)'  
-        },  
-        seekBarColors: {  
-          base: 'rgba(255, 255, 0, 0.3)',  
-          buffered: 'rgba(255, 255, 0, 0.6)',  
-          played: 'rgb(255, 255, 0)'  
+        shaka.polyfill.installAll();  
+    
+        if (!shaka.Player.isBrowserSupported()) {  
+            console.error('Browser not supported');  
+            return;  
         }  
-      });  
-  
-      // ✅ Your DRM Key + MPD URL  
-      let drmConfig = {  
-        clearKeys: {  
-          "23d746c8864079a0fbe3e917614ce9a4": "6c11aeb5174dfeb6acd1c92a58e012a6"  
-        }  
-      };  
-  
-      let streamUrl = "https://otte.live.fly.ww.aiv-cdn.net/pdx-nitro/live/clients/dash/enc/bb9z4rise6/out/v1/f88e764102cb43a69031373b79dc31fd/cenc.mpd";  
-  
-      player.configure({  
-        drm: drmConfig,  
-        streaming: {  
-          lowLatencyMode: true,  
-          bufferingGoal: 15,  
-          rebufferingGoal: 2,  
-          bufferBehind: 15,  
-          retryParameters: {  
-            timeout: 10000,  
-            maxAttempts: 5,  
-            baseDelay: 300,  
-            backoffFactor: 1.2  
-          },  
-          segmentRequestTimeout: 8000,  
-          segmentPrefetchLimit: 2,  
-          useNativeHlsOnSafari: true  
-        },  
-        manifest: {  
-          retryParameters: {  
-            timeout: 8000,  
-            maxAttempts: 3  
-          }  
-        }  
-      });  
-  
-      player.addEventListener('error', (event) => {  
-        console.error('Shaka Player Error:', event.detail);  
-      });  
-  
-      try {  
-        await player.load(streamUrl);  
-        console.log("Stream loaded successfully");  
-      } catch (error) {  
-        console.error('Load error:', error);  
-      }  
+        
+        // Start the logic flow
+        handlePopup();
     });  
   </script>  
 </body>  
