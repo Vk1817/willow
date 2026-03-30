@@ -4,116 +4,132 @@
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">  
   <title>Prime By Allrounder</title>     
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FMP9REY96D"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  <!-- Shaka Player -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
-
+  gtag('config', 'G-FMP9REY96D');
+</script>
   <style>  
-    * { margin: 0; padding: 0; box-sizing: border-box; }  
+   * { margin: 0; padding: 0; box-sizing: border-box; }  
     html, body {  
       background: #000;  
       height: 100vh;  
       width: 100vw;  
       overflow: hidden;  
-      font-family: system-ui;
+      font-family: system-ui, -apple-system, sans-serif;  
     }  
-
     .shaka-video-container {  
       position: absolute;  
       inset: 0;  
       width: 100%;  
       height: 100%;  
     }  
-
     video {  
       width: 100%;  
       height: 100%;  
-      object-fit: contain;  
       background: #000;  
+      object-fit: contain;  
     }  
-
-    /* Hide loader */
-    .shaka-spinner-container,
-    .shaka-spinner {
-      display: none !important;
-    }
+    .shaka-spinner-container,  
+    .shaka-spinner,  
+    .shaka-spinner-svg {  
+      display: none !important;  
+      visibility: hidden !important;  
+      opacity: 0 !important;  
+    }  
   </style>  
 </head>
-
-<body>  
-
-<div class="shaka-video-container" data-shaka-player>  
-  <video id="video" playsinline preload="metadata"
-    poster="https://i.ibb.co/d0yXW75V/108693714.jpg"></video>  
-</div>  
-
-<script>  
-document.addEventListener('DOMContentLoaded', async () => {
-
-  shaka.polyfill.installAll();
-
-  if (!shaka.Player.isBrowserSupported()) {
-    alert("Browser not supported");
-    return;
-  }
-
-  const video = document.getElementById('video');
-  const player = new shaka.Player(video);
-
-  const container = document.querySelector('.shaka-video-container');
-  const ui = new shaka.ui.Overlay(player, container, video);
-
-  ui.configure({
-    controlPanelElements: [
-      'play_pause','time_and_duration','mute','volume',
-      'spacer','quality','fullscreen'
-    ]
-  });
-
-  // DRM config
-  player.configure({
-    drm: {
-      clearKeys: {
-        "290e09c837da78d5cd961978d390515c": "b748836c71e6a4ca68ef5b5652db6247"
-      }
-    },
-    streaming: {
-      lowLatencyMode: true,
-      bufferingGoal: 15
-    }
-  });
-
-  const streamUrl = "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/tll6uwepxa/out/v1/a7f67cbb33df46539312956427343886/cenc.mpd";
-
-  try {
-    await player.load(streamUrl);
-    video.muted = false;
-    await video.play();
-    console.log("Stream started");
-  } catch (e) {
-    console.error("Error:", e);
-  }
-
-  // ERROR HANDLING
-  player.addEventListener('error', e => {
-    console.log("Shaka error:", e.detail);
-  });
-
-});
-
-
-// ✅ CLICK ANYWHERE → OPEN OFFSTUMP + LOAD AD
-document.body.addEventListener('click', function () {
-  window.open("https://offstump.com", "_blank");
-
-  var s = document.createElement('script');
-  s.src = "https://bvtpk.com/tag.min.js";
-  s.dataset.zone = "10603308";
-  document.body.appendChild(s);
-}, { once: true });
-
-</script>  
-
-</body>  
+  
+  <body>  
+  <div class="shaka-video-container" data-shaka-player>  
+    <video autoplay playsinline preload="metadata" poster="https://i.ibb.co/d0yXW75V/108693714.jpg"></video>  
+  </div>  
+  
+  <script>  
+    document.addEventListener('DOMContentLoaded', async () => {  
+      shaka.polyfill.installAll();  
+  
+      if (!shaka.Player.isBrowserSupported()) {  
+        console.error('Browser not supported');  
+        return;  
+      }  
+  
+      const video = document.querySelector('video');  
+      const player = new shaka.Player();  
+      await player.attach(video);  
+  
+      const container = document.querySelector('.shaka-video-container');  
+      const ui = new shaka.ui.Overlay(player, container, video);  
+  
+      ui.configure({  
+        controlPanelElements: [  
+          'play_pause', 'time_and_duration', 'mute', 'volume',  
+          'spacer', 'language', 'captions', 'picture_in_picture',  
+          'quality', 'fullscreen'  
+        ],  
+        volumeBarColors: {  
+          base: 'rgba(255, 192, 203, 0.3)',  
+          level: 'rgb(255, 105, 180)'  
+        },  
+        seekBarColors: {  
+          base: 'rgba(255, 255, 0, 0.3)',  
+          buffered: 'rgba(255, 255, 0, 0.6)',  
+          played: 'rgb(255, 255, 0)'  
+        }  
+      });  
+  
+      // ✅ Your DRM Key + MPD URL  
+      let drmConfig = {  
+        clearKeys: {  
+          "2d0646dd8a8c511de3b2485071705038": "1ddbda2f121875fd43dcd758497cbf82" 
+        }  
+      };  
+  
+      let streamUrl = "https://a96aivottlinear-a.akamaihd.net/OTTB/lhr-nitro/enc/7j8yftutgs/out/v1/8a40608178f045839a1c0c0a055d6a90/cenc.mpd";  
+  
+      player.configure({  
+        drm: drmConfig,  
+        streaming: {  
+          lowLatencyMode: true,  
+          bufferingGoal: 15,  
+          rebufferingGoal: 2,  
+          bufferBehind: 15,  
+          retryParameters: {  
+            timeout: 10000,  
+            maxAttempts: 5,  
+            baseDelay: 300,  
+            backoffFactor: 1.2  
+          },  
+          segmentRequestTimeout: 8000,  
+          segmentPrefetchLimit: 2,  
+          useNativeHlsOnSafari: true  
+        },  
+        manifest: {  
+          retryParameters: {  
+            timeout: 8000,  
+            maxAttempts: 3  
+          }  
+        }  
+      });  
+  
+      player.addEventListener('error', (event) => {  
+        console.error('Shaka Player Error:', event.detail);  
+      });  
+  
+      try {  
+        await player.load(streamUrl);  
+        console.log("Stream loaded successfully");  
+      } catch (error) {  
+        console.error('Load error:', error);  
+      }  
+    });  
+  </script>  
+    
+  </body>  
 </html>
