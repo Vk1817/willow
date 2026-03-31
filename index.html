@@ -3,7 +3,7 @@
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  <title>crickcast-willowsports</title>     
+  <title>Crickcast-willowsports</title>     
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
@@ -67,12 +67,12 @@
       }  
 
       const video = document.querySelector('video');  
+      const container = document.querySelector('.shaka-video-container');  
 
-      // ✅ Required fix
+      // ✅ Fixed player init
       const player = new shaka.Player(video);
       await player.attach(video);  
 
-      const container = document.querySelector('.shaka-video-container');  
       const ui = new shaka.ui.Overlay(player, container, video);  
 
       ui.configure({  
@@ -80,16 +80,7 @@
           'play_pause', 'time_and_duration', 'mute', 'volume',  
           'spacer', 'language', 'captions', 'picture_in_picture',  
           'quality', 'fullscreen'  
-        ],  
-        volumeBarColors: {  
-          base: 'rgba(255, 192, 203, 0.3)',  
-          level: 'rgb(255, 105, 180)'  
-        },  
-        seekBarColors: {  
-          base: 'rgba(255, 255, 0, 0.3)',  
-          buffered: 'rgba(255, 255, 0, 0.6)',  
-          played: 'rgb(255, 255, 0)'  
-        }  
+        ]  
       });  
 
       let drmConfig = {  
@@ -101,28 +92,7 @@
       let streamUrl = "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/tll6uwepxa/out/v1/a7f67cbb33df46539312956427343886/cenc.mpd";  
 
       player.configure({  
-        drm: drmConfig,  
-        streaming: {  
-          lowLatencyMode: true,  
-          bufferingGoal: 15,  
-          rebufferingGoal: 2,  
-          bufferBehind: 15,  
-          retryParameters: {  
-            timeout: 10000,  
-            maxAttempts: 5,  
-            baseDelay: 300,  
-            backoffFactor: 1.2  
-          },  
-          segmentRequestTimeout: 8000,  
-          segmentPrefetchLimit: 2,  
-          useNativeHlsOnSafari: true  
-        },  
-        manifest: {  
-          retryParameters: {  
-            timeout: 8000,  
-            maxAttempts: 3  
-          }  
-        }  
+        drm: drmConfig  
       });  
 
       player.addEventListener('error', (event) => {  
@@ -136,7 +106,7 @@
         console.error('Load error:', error);  
       }  
 
-      // 🔥 CLICK AD LOGIC (NO UI)
+      // 🔥 ONLY OFFSTUMP CLICK (NO REDIRECTS)
       let firstClickDone = false;
 
       container.addEventListener("click", () => {
@@ -152,13 +122,6 @@
 
     });  
   </script>  
-
-  <script>
-    (function(s){
-      s.dataset.zone='10603308',
-      s.src='https://bvtpk.com/tag.min.js'
-    })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
-  </script>
 
 </body>  
 </html>
