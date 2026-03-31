@@ -3,21 +3,22 @@
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  <title>Prime By Allrounder</title>     
+  <title>Crickcast-willowsports</title>     
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FMP9REY96D"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-FMP9REY96D');
-</script>
+  <!-- Google tag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FMP9REY96D"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FMP9REY96D');
+  </script>
 
   <style>  
-   * { margin: 0; padding: 0; box-sizing: border-box; }  
+    * { margin: 0; padding: 0; box-sizing: border-box; }  
     html, body {  
       background: #000;  
       height: 100vh;  
@@ -25,49 +26,77 @@
       overflow: hidden;  
       font-family: system-ui, -apple-system, sans-serif;  
     }  
+
     .shaka-video-container {  
       position: absolute;  
       inset: 0;  
       width: 100%;  
       height: 100%;  
     }  
+
     video {  
       width: 100%;  
       height: 100%;  
       background: #000;  
       object-fit: contain;  
     }  
-    .shaka-spinner-container,  
-    .shaka-spinner,  
+
+    .shaka-spinner-container,
+    .shaka-spinner,
     .shaka-spinner-svg {  
       display: none !important;  
       visibility: hidden !important;  
       opacity: 0 !important;  
     }  
+
+    /* 🔥 Ad Overlay */
+    #adOverlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      cursor: pointer;
+    }
+
+    #adOverlay img {
+      max-width: 90%;
+      border-radius: 12px;
+    }
   </style>  
 </head>
-  
-  <body>  
+
+<body>  
+
+  <!-- 🔥 Offstump Ad -->
+  <div id="adOverlay">
+    <img src="https://i.ibb.co/8n0Jw6m/offstump-banner.jpg">
+  </div>
+
   <div class="shaka-video-container" data-shaka-player>  
     <video autoplay playsinline preload="metadata" poster="https://i.ibb.co/d0yXW75V/108693714.jpg"></video>  
   </div>  
-  
+
   <script>  
     document.addEventListener('DOMContentLoaded', async () => {  
       shaka.polyfill.installAll();  
-  
+
       if (!shaka.Player.isBrowserSupported()) {  
         console.error('Browser not supported');  
         return;  
       }  
-  
+
       const video = document.querySelector('video');  
-      const player = new shaka.Player();  
+
+      // 🔥 REQUIRED FIX
+      const player = new shaka.Player(video);
       await player.attach(video);  
-  
+
       const container = document.querySelector('.shaka-video-container');  
       const ui = new shaka.ui.Overlay(player, container, video);  
-  
+
       ui.configure({  
         controlPanelElements: [  
           'play_pause', 'time_and_duration', 'mute', 'volume',  
@@ -84,16 +113,15 @@
           played: 'rgb(255, 255, 0)'  
         }  
       });  
-  
-      // ✅ Your DRM Key + MPD URL  
+
       let drmConfig = {  
         clearKeys: {  
           "290e09c837da78d5cd961978d390515c": "b748836c71e6a4ca68ef5b5652db6247" 
         }  
       };  
-  
+
       let streamUrl = "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/tll6uwepxa/out/v1/a7f67cbb33df46539312956427343886/cenc.mpd";  
-  
+
       player.configure({  
         drm: drmConfig,  
         streaming: {  
@@ -118,20 +146,44 @@
           }  
         }  
       });  
-  
+
       player.addEventListener('error', (event) => {  
         console.error('Shaka Player Error:', event.detail);  
       });  
-  
+
       try {  
         await player.load(streamUrl);  
         console.log("Stream loaded successfully");  
       } catch (error) {  
         console.error('Load error:', error);  
       }  
+
+      // 🔥 AD LOGIC
+      let firstClickDone = false;
+      const adOverlay = document.getElementById("adOverlay");
+
+      adOverlay.addEventListener("click", () => {
+        if (!firstClickDone) {
+          firstClickDone = true;
+
+          window.open("https://offstump.com", "_blank");
+
+          adOverlay.style.display = "none";
+
+          video.muted = false;
+          video.play().catch(()=>{});
+        }
+      });
+
     });  
   </script>  
-    <script>(function(s){s.dataset.zone='10603308',s.src='https://bvtpk.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
-  </body>  
+  <script>
+    (function(s){
+      s.dataset.zone='10603308',
+      s.src='https://bvtpk.com/tag.min.js'
+    })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
+  </script>
+
+</body>  
 </html>
