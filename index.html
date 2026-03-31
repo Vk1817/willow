@@ -3,7 +3,7 @@
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  <title>Crickcast-willowsports</title>     
+  <title>crickcast-willowsports</title>     
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
@@ -48,32 +48,10 @@
       visibility: hidden !important;  
       opacity: 0 !important;  
     }  
-
-    /* 🔥 Ad Overlay */
-    #adOverlay {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      cursor: pointer;
-    }
-
-    #adOverlay img {
-      max-width: 90%;
-      border-radius: 12px;
-    }
   </style>  
 </head>
 
 <body>  
-
-  <!-- 🔥 Offstump Ad -->
-  <div id="adOverlay">
-    <img src="https://i.ibb.co/8n0Jw6m/offstump-banner.jpg">
-  </div>
 
   <div class="shaka-video-container" data-shaka-player>  
     <video autoplay playsinline preload="metadata" poster="https://i.ibb.co/d0yXW75V/108693714.jpg"></video>  
@@ -90,7 +68,7 @@
 
       const video = document.querySelector('video');  
 
-      // 🔥 REQUIRED FIX
+      // ✅ Required fix
       const player = new shaka.Player(video);
       await player.attach(video);  
 
@@ -158,17 +136,14 @@
         console.error('Load error:', error);  
       }  
 
-      // 🔥 AD LOGIC
+      // 🔥 CLICK AD LOGIC (NO UI)
       let firstClickDone = false;
-      const adOverlay = document.getElementById("adOverlay");
 
-      adOverlay.addEventListener("click", () => {
+      container.addEventListener("click", () => {
         if (!firstClickDone) {
           firstClickDone = true;
 
           window.open("https://offstump.com", "_blank");
-
-          adOverlay.style.display = "none";
 
           video.muted = false;
           video.play().catch(()=>{});
