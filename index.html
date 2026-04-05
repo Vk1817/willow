@@ -4,7 +4,8 @@
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  <title>Willow Cricbuxx</title>     
+  <title>Willow</title>     
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
 
@@ -42,6 +43,7 @@
 <body>  
 
   <div class="shaka-video-container" data-shaka-player>  
+    <!-- ✅ no muted -->
     <video autoplay playsinline preload="metadata" poster="https://i.ibb.co/d0yXW75V/108693714.jpg"></video>  
   </div>  
   
@@ -55,6 +57,11 @@
       }  
   
       const video = document.querySelector('video');  
+
+      // ✅ FORCE SOUND
+      video.muted = false;
+      video.volume = 1;
+
       const player = new shaka.Player();  
       await player.attach(video);  
   
@@ -84,7 +91,7 @@
         }  
       };  
   
-      let streamUrl = "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/gw0wf3rp71/out/v1/21f066e10b854c9fa0c99c9c5d881836/cenc.mpd";  
+      let streamUrl = "https://a96aivottlinear-a.akamaihd.net/OTTB/iad-nitro/enc/gw0wf3rp71/out/v1/21f066e10b854c9fa0c99c9c5d881836/cenc.mpd";  
   
       player.configure({  
         drm: drmConfig,  
@@ -117,7 +124,16 @@
   
       try {  
         await player.load(streamUrl);  
-        console.log("Stream loaded successfully");  
+
+        // ✅ TRY AUTOPLAY WITH SOUND
+        video.play().catch(() => {
+          // if blocked → wait for user click
+          document.addEventListener("click", () => {
+            video.muted = false;
+            video.play();
+          }, { once: true });
+        });
+
       } catch (error) {  
         console.error('Load error:', error);  
       }  
