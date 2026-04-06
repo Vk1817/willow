@@ -3,7 +3,7 @@
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  <title>Prime By Allrounder</title>     
+  <title>Willow-Cricbuzz</title>     
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
@@ -41,103 +41,88 @@
   
 <body>  
 
-  <div class="shaka-video-container" data-shaka-player>  
-    <!-- no muted -->
-    <video autoplay playsinline preload="metadata" poster="https://i.ibb.co/d0yXW75V/108693714.jpg"></video>  
-  </div>  
-  
-  <script>  
-    document.addEventListener('DOMContentLoaded', async () => {  
-      shaka.polyfill.installAll();  
-  
-      if (!shaka.Player.isBrowserSupported()) {  
-        console.error('Browser not supported');  
-        return;  
+<div class="shaka-video-container" data-shaka-player>  
+  <video autoplay playsinline preload="metadata" poster="https://i.ibb.co/d0yXW75V/108693714.jpg"></video>  
+</div>  
+
+<script>  
+document.addEventListener('DOMContentLoaded', async () => {  
+  shaka.polyfill.installAll();  
+
+  if (!shaka.Player.isBrowserSupported()) {  
+    console.error('Browser not supported');  
+    return;  
+  }  
+
+  const video = document.querySelector('video');  
+  const player = new shaka.Player();  
+  await player.attach(video);  
+
+  const container = document.querySelector('.shaka-video-container');  
+  const ui = new shaka.ui.Overlay(player, container, video);  
+
+  ui.configure({  
+    controlPanelElements: [  
+      'play_pause', 'time_and_duration', 'mute', 'volume',  
+      'spacer', 'language', 'captions', 'picture_in_picture',  
+      'quality', 'fullscreen'  
+    ],  
+    volumeBarColors: {  
+      base: 'rgba(255, 192, 203, 0.3)',  
+      level: 'rgb(255, 105, 180)'  
+    },  
+    seekBarColors: {  
+      base: 'rgba(255, 255, 0, 0.3)',  
+      buffered: 'rgba(255, 255, 0, 0.6)',  
+      played: 'rgb(255, 255, 0)'  
+    }  
+  });  
+
+  const drmConfig = {  
+    clearKeys: {  
+      "b83f5ca011de1ebfd8a121c84961ca01": "609ca477cab538803f2a4289f7e55c24" 
+    }  
+  };  
+
+  const streamUrl = "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/a9iwtyobtf/out/v1/33819872fdbc4f17af37383b78ee70a4/cenc.mpd";  
+
+  player.configure({  
+    drm: drmConfig,  
+    streaming: {  
+      lowLatencyMode: true,  
+      bufferingGoal: 15,  
+      rebufferingGoal: 2,  
+      bufferBehind: 15,  
+      retryParameters: {  
+        timeout: 10000,  
+        maxAttempts: 5,  
+        baseDelay: 300,  
+        backoffFactor: 1.2  
+      },  
+      segmentRequestTimeout: 8000,  
+      segmentPrefetchLimit: 2,  
+      useNativeHlsOnSafari: true  
+    },  
+    manifest: {  
+      retryParameters: {  
+        timeout: 8000,  
+        maxAttempts: 3  
       }  
-  
-      const video = document.querySelector('video');  
+    }  
+  });  
 
-      // ✅ force sound
-      video.muted = false;
-      video.volume = 1;
+  player.addEventListener('error', (event) => {  
+    console.error('Shaka Player Error:', event.detail);  
+  });  
 
-      const player = new shaka.Player();  
-      await player.attach(video);  
-  
-      const container = document.querySelector('.shaka-video-container');  
-      const ui = new shaka.ui.Overlay(player, container, video);  
-  
-      ui.configure({  
-        controlPanelElements: [  
-          'play_pause', 'time_and_duration', 'mute', 'volume',  
-          'spacer', 'language', 'captions', 'picture_in_picture',  
-          'quality', 'fullscreen'  
-        ],  
-        volumeBarColors: {  
-          base: 'rgba(255, 192, 203, 0.3)',  
-          level: 'rgb(255, 105, 180)'  
-        },  
-        seekBarColors: {  
-          base: 'rgba(255, 255, 0, 0.3)',  
-          buffered: 'rgba(255, 255, 0, 0.6)',  
-          played: 'rgb(255, 255, 0)'  
-        }  
-      });  
-  
-      let drmConfig = {  
-        clearKeys: {  
-          "9a29d4f3b6e540b3aa2f36927c01b6f4": "57b670b45b5cb453a9f48fa975b702c1" 
-        }  
-      };  
-  
-      let streamUrl = "https://bks02.starhubgo.com/bpk-token/1aa@nucdjkswkmejjkq42lsbrfgsuudvyissnwfsteca/bpk-tv/HubSports4HDnew/output/manifest.mpd?bkm-query&token=MTc3NTM5NzM0MzowYTExNmRkYmU5YjljNzI4NDhhN2NiNWNmMDY1YzMxODRlZDM5ZWY2ZDNhZDhlNjhjMWYxZjU2YTQ3ZjM1OGM5";  
-  
-      player.configure({  
-        drm: drmConfig,  
-        streaming: {  
-          lowLatencyMode: true,  
-          bufferingGoal: 15,  
-          rebufferingGoal: 2,  
-          bufferBehind: 15,  
-          retryParameters: {  
-            timeout: 10000,  
-            maxAttempts: 5,  
-            baseDelay: 300,  
-            backoffFactor: 1.2  
-          },  
-          segmentRequestTimeout: 8000,  
-          segmentPrefetchLimit: 2,  
-          useNativeHlsOnSafari: true  
-        },  
-        manifest: {  
-          retryParameters: {  
-            timeout: 8000,  
-            maxAttempts: 3  
-          }  
-        }  
-      });  
-  
-      player.addEventListener('error', (event) => {  
-        console.error('Shaka Player Error:', event.detail);  
-      });  
-  
-      try {  
-        await player.load(streamUrl);  
-
-        // autoplay with sound (fallback click if blocked)
-        video.play().catch(() => {
-          document.addEventListener("click", () => {
-            video.muted = false;
-            video.play();
-          }, { once: true });
-        });
-
-      } catch (error) {  
-        console.error('Load error:', error);  
-      }  
-    });  
-  </script>  
+  try {  
+    await player.load(streamUrl);  
+    console.log("Stream loaded successfully");  
+  } catch (error) {  
+    console.error('Load error:', error);  
+  }  
+});  
+</script>
 
 </body>  
 </html>
-
