@@ -3,14 +3,13 @@
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  <title>Hub sports</title>     
+  <title> Willow Cricbuzz</title>     
 
-  <!-- Shaka Player -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
 
   <style>  
-   * { margin: 0; padding: 0; box-sizing: border-box; }  
+    * { margin: 0; padding: 0; box-sizing: border-box; }  
 
     html, body {  
       background: #000;  
@@ -34,25 +33,24 @@
       object-fit: contain;  
     }  
 
-    /* Remove loading spinner */
     .shaka-spinner-container,  
     .shaka-spinner,  
     .shaka-spinner-svg {  
       display: none !important;  
+      visibility: hidden !important;  
+      opacity: 0 !important;  
     }  
   </style>  
-</head>
+</head>  
 
 <body>  
 
   <div class="shaka-video-container" data-shaka-player>  
-    <video autoplay playsinline preload="metadata" 
-    poster="https://elamplificador.com/wp-content/uploads/2023/08/trucos-amazon-primevideo-ksrD-620x349@abc.png"></video>  
+    <video autoplay playsinline preload="metadata" poster="https://elamplificador.com/wp-content/uploads/2023/08/trucos-amazon-primevideo-ksrD-620x349@abc.png"></video>  
   </div>  
 
   <script>  
     document.addEventListener('DOMContentLoaded', async () => {  
-
       shaka.polyfill.installAll();  
 
       if (!shaka.Player.isBrowserSupported()) {  
@@ -84,11 +82,10 @@
         }  
       });  
 
-      // DRM Config
       let drmConfig = {  
         clearKeys: {  
           "9a29d4f3b6e540b3aa2f36927c01b6f4":
- "57b670b45b5cb453a9f48fa975b702c1"  
+          "57b670b45b5cb453a9f48fa975b702c1"  
         }  
       };  
 
@@ -129,7 +126,6 @@
       } catch (error) {  
         console.error('Load error:', error);  
       }  
-
     });  
   </script>  
 
